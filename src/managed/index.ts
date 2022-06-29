@@ -9,14 +9,14 @@ import {
   MteArrStatus,
   MteStrStatus,
 } from "mte";
-import { initMteLicense } from "../common";
-import { createMteEncoder } from "../encoders/mte";
-import { createMteDecoder } from "../decoders/mte";
 import {
+  initMteLicense,
+  createMteEncoder,
+  createMteDecoder,
   getMteState,
   restoreMteState,
   validateStatusIsSuccess,
-} from "../common";
+} from "../core";
 import { DefaultSettings } from "../types";
 import { setItem, takeItem } from "./memory-store";
 
