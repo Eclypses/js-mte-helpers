@@ -61,11 +61,11 @@ export function mkeDecrypt(
 }
 
 /**
- * MKE decrypt a Uint8Array and return the decrypted value as a Base64 string.
+ * MKE decrypt a Uint8Array and return the decrypted value as a plaintext string.
  * @param payload A Uint8Array to MKE decrypt.
  * @param decrypter An instance of an MKE decrypter.
  * @param mteBase An instance of MTE Base.
- * @returns An MKE decrypted Base64 string.
+ * @returns An MKE decrypted plaintext string.
  */
 export function mkeDecryptStr(
   payload: Uint8Array,
@@ -78,7 +78,7 @@ export function mkeDecryptStr(
 }
 
 /**
- * MKE decrypt a plaintext string and return the decrypted value as a Uint8Array.
+ * MKE decrypt a B64 string and return the decrypted value as a Uint8Array.
  * @param payload A plaintext string to MKE decrypt.
  * @param decrypter An instance of an MKE decrypter.
  * @param mteBase An instance of MTE Base.
@@ -95,13 +95,13 @@ export function mkedecryptB64(
 }
 
 /**
- * MKE decrypt a plaintext string and return the decrypted value as a Base64 string.
+ * MKE decrypt a B64 string and return the decrypted value as a plaintext string.
  * @param payload A plaintext string to MKE decrypt.
  * @param decrypter An instance of an MKE decrypter.
  * @param mteBase An instance of MTE Base.
  * @returns An MKE decrypted Base64 string.
  */
-export function mteDecryptStrB64(
+export function mkeDecryptStrB64(
   payload: string,
   decoder: MteMkeDec,
   mteBase: MteBase

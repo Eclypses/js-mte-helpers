@@ -101,7 +101,7 @@ export function mkeEncryptStr(
  * @param mteBase An instance of MTE Base.
  * @returns An MKE encrypted Base64 string.
  */
-export function mteEncryptStrB64(
+export function mkeEncryptStrB64(
   payload: string,
   encoder: MteMkeEnc,
   mteBase: MteBase
