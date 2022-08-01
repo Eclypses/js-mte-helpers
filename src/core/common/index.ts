@@ -35,6 +35,8 @@ export function initMteLicense(
  * Validate that an MTE status is successful. If the status is NOT successful, throw an error.
  * @param status An MTE status.
  * @param mteBase An instance of MTE Base.
+ *
+ * TODO - there could be an warning message, not an error, but a warning.
  */
 export function validateStatusIsSuccess(status: MteStatus, mteBase: MteBase) {
   if (status !== MteStatus.mte_status_success) {
@@ -48,12 +50,10 @@ export function validateStatusIsSuccess(status: MteStatus, mteBase: MteBase) {
  * Restore an Encoder or Decoder using a previously saved MTE state.
  * @param encdec An instance of an Encoder or Decoder.
  * @param state The previous MTE state.
- * @param mteBase An instance of MTE Base.
  */
 export function restoreMteState(
   encdec: EncDec,
-  state: string | Uint8Array,
-  mteBase: MteBase
+  state: string | Uint8Array
 ): void {
   let result: MteStatus;
   if (state instanceof Uint8Array) {
@@ -63,7 +63,7 @@ export function restoreMteState(
   }
 
   // validate restore event
-  validateStatusIsSuccess(result, mteBase);
+  validateStatusIsSuccess(result, encdec);
 }
 
 /**

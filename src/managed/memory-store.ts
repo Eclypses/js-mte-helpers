@@ -1,7 +1,10 @@
+/**
+ * The store!
+ */
 const store = new Map();
 
 /**
- * Put any item in the store.
+ * Put an item in the store.
  */
 export async function setItem(id: any, value: any) {
   store.set(id, value);

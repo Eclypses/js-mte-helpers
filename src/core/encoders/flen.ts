@@ -1,9 +1,8 @@
-import { MteFlenEnc, MteBase, MteWasm } from "mte";
+import { MteFlenEnc, MteWasm } from "mte";
 import { validateStatusIsSuccess } from "../common";
 
 type FlenInitOptions = {
   mteWasm: MteWasm;
-  mteBase: MteBase;
   personalization: string;
   nonce: string | number;
   entropy:
@@ -40,7 +39,7 @@ export function createFlenEncoder(options: FlenInitOptions) {
 
   // handle instantiation
   const initResult = encoder.instantiate(options.personalization);
-  validateStatusIsSuccess(initResult, options.mteBase);
+  validateStatusIsSuccess(initResult, encoder);
 
   return encoder;
 }
@@ -49,16 +48,11 @@ export function createFlenEncoder(options: FlenInitOptions) {
  * MTE Fixed-Length encode a Uint8Array and return the encoded value as a Uint8Array.
  * @param payload A Uint8Array to MTE encode.
  * @param encoder An instance of an MTE encoder.
- * @param mteBase An instance of MTE Base.
  * @returns An MTE Fixed-Length encoded Uint8Array.
  */
-export function flenEncode(
-  payload: Uint8Array,
-  encoder: MteFlenEnc,
-  mteBase: MteBase
-) {
+export function flenEncode(payload: Uint8Array, encoder: MteFlenEnc) {
   const encodeResult = encoder.encode(payload);
-  validateStatusIsSuccess(encodeResult.status, mteBase);
+  validateStatusIsSuccess(encodeResult.status, encoder);
   return encodeResult.arr!;
 }
 
@@ -66,16 +60,11 @@ export function flenEncode(
  * MTE Fixed-Length encode a Uint8Array and return the encoded value as a Base64 string.
  * @param payload A Uint8Array to MTE encode.
  * @param encoder An instance of an MTE encoder.
- * @param mteBase An instance of MTE Base.
  * @returns An MTE Fixed-Length encoded Uint8Array.
  */
-export function flenEncodeB64(
-  payload: Uint8Array,
-  encoder: MteFlenEnc,
-  mteBase: MteBase
-) {
+export function flenEncodeB64(payload: Uint8Array, encoder: MteFlenEnc) {
   const encodeResult = encoder.encodeB64(payload);
-  validateStatusIsSuccess(encodeResult.status, mteBase);
+  validateStatusIsSuccess(encodeResult.status, encoder);
   return encodeResult.str!;
 }
 
@@ -83,16 +72,11 @@ export function flenEncodeB64(
  * MTE Fixed-Length encode a plaintext string and return the encoded value as a Uint8Array.
  * @param payload A Uint8Array to MTE encode.
  * @param encoder An instance of an MTE encoder.
- * @param mteBase An instance of MTE Base.
  * @returns An MTE Fixed-Length encoded Uint8Array.
  */
-export function flenEncodeStr(
-  payload: string,
-  encoder: MteFlenEnc,
-  mteBase: MteBase
-) {
+export function flenEncodeStr(payload: string, encoder: MteFlenEnc) {
   const encodeResult = encoder.encodeStr(payload);
-  validateStatusIsSuccess(encodeResult.status, mteBase);
+  validateStatusIsSuccess(encodeResult.status, encoder);
   return encodeResult.arr!;
 }
 
@@ -100,15 +84,10 @@ export function flenEncodeStr(
  * MTE Fixed-Length encode a plaintext string and return the encoded value as a Base64 string.
  * @param payload A Uint8Array to MTE encode.
  * @param encoder An instance of an MTE encoder.
- * @param mteBase An instance of MTE Base.
  * @returns An MTE Fixed-Length encoded Uint8Array.
  */
-export function flenEncodeStrB64(
-  payload: string,
-  encoder: MteFlenEnc,
-  mteBase: MteBase
-) {
+export function flenEncodeStrB64(payload: string, encoder: MteFlenEnc) {
   const encodeResult = encoder.encodeStrB64(payload);
-  validateStatusIsSuccess(encodeResult.status, mteBase);
+  validateStatusIsSuccess(encodeResult.status, encoder);
   return encodeResult.str!;
 }

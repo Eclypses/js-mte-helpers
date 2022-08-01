@@ -24,7 +24,6 @@ import { setItem, takeItem } from "./memory-store";
  * Declare variables to hold mteWasm and mteBase
  */
 let mteWasm: MteWasm;
-let mteBase: MteBase;
 
 /**
  *  Declare variable for get/set state functions.
@@ -91,12 +90,12 @@ export async function instantiateMteWasm(
     options.timestampWindow || _SETTINGS.timestampWindow;
   _SETTINGS.sequenceWindow = options.sequenceWindow || _SETTINGS.sequenceWindow;
 
-  // assign mteWasm variable, and instantiate wasm
+  // assign mteWasm to global variable, and instantiate wasm
   mteWasm = new MteWasm();
   await mteWasm.instantiate();
 
   // assign mteBase variable
-  mteBase = new MteBase(mteWasm);
+  const mteBase = new MteBase(mteWasm);
 
   // Initialize MTE license
   initMteLicense(options.licenseKey, options.licenseCompany, mteBase);
@@ -126,7 +125,6 @@ export async function createEncoder(options: CreateEncoderOptions) {
   // create new encoder
   const encoder = createMteEncoder({
     mteWasm,
-    mteBase,
     personalization: options.personalization,
     nonce: options.nonce,
     entropy: options.entropy,
@@ -155,7 +153,6 @@ export async function createDecoder(options: CreateDecoderOptions) {
   // create new decoder
   const decoder = createMteDecoder({
     mteWasm: mteWasm,
-    mteBase: mteBase,
     personalization: options.personalization,
     nonce: options.nonce,
     entropy: options.entropy,
@@ -257,7 +254,7 @@ export async function mteEncode(
   }
 
   // restore encoder
-  restoreMteState(encoder, savedState, mteBase);
+  restoreMteState(encoder, savedState);
 
   // encode data
   let encodeResult: MteArrStatus | MteStrStatus;
@@ -277,7 +274,7 @@ export async function mteEncode(
   }
 
   // check encode result
-  validateStatusIsSuccess(encodeResult.status, mteBase);
+  validateStatusIsSuccess(encodeResult.status, encoder);
 
   // get encoder state
   const state = getMteState(encoder, _SETTINGS.stateType);
@@ -368,7 +365,7 @@ export async function mteDecode(
   }
 
   // check decode result
-  validateStatusIsSuccess(decodeResult.status, mteBase);
+  validateStatusIsSuccess(decodeResult.status, decoder);
 
   const state = getMteState(decoder, _SETTINGS.stateType);
   await cache.saveState(options.id, state);

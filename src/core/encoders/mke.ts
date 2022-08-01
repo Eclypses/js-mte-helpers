@@ -1,9 +1,8 @@
-import { MteMkeEnc, MteWasm, MteBase } from "mte";
+import { MteMkeEnc, MteWasm } from "mte";
 import { validateStatusIsSuccess } from "../common";
 
 type MkeEncoderOptions = {
   mteWasm: MteWasm;
-  mteBase: MteBase;
   personalization: string;
   nonce: string | number;
   entropy:
@@ -20,93 +19,73 @@ type MkeEncoderOptions = {
  */
 export function createMkeEncoder(options: MkeEncoderOptions) {
   // create encoder
-  const mteEncoder = MteMkeEnc.fromdefault(options.mteWasm);
+  const encryptor = MteMkeEnc.fromdefault(options.mteWasm);
 
   // handle entropy
   if (options.entropy instanceof Uint8Array) {
-    mteEncoder.setEntropyArr(options.entropy);
+    encryptor.setEntropyArr(options.entropy);
   } else {
     if (options.entropy.encoding === "B64") {
-      mteEncoder.setEntropyB64(options.entropy.value);
+      encryptor.setEntropyB64(options.entropy.value);
     } else {
-      mteEncoder.setEntropyStr(options.entropy.value);
+      encryptor.setEntropyStr(options.entropy.value);
     }
   }
 
   // handle nonce
-  mteEncoder.setNonce(String(options.nonce));
+  encryptor.setNonce(String(options.nonce));
 
   // handle instantiation
-  const initResult = mteEncoder.instantiate(options.personalization);
-  validateStatusIsSuccess(initResult, options.mteBase);
+  const initResult = encryptor.instantiate(options.personalization);
+  validateStatusIsSuccess(initResult, encryptor);
 
-  return mteEncoder;
+  return encryptor;
 }
 
 /**
  * MKE encrypt a Uint8Array and return the encrypted value as a Uint8Array.
  * @param payload A Uint8Array to MKE encrypt.
  * @param encrypter An instance of an MKE encrypter.
- * @param mteBase An instance of MTE Base.
  * @returns An MKE encrypted Uint8Array.
  */
-export function mkeEncrypt(
-  payload: Uint8Array,
-  encrypter: MteMkeEnc,
-  mteBase: MteBase
-) {
-  const encodeResult = encrypter.encode(payload);
-  validateStatusIsSuccess(encodeResult.status, mteBase);
-  return encodeResult.arr!;
+export function mkeEncrypt(payload: Uint8Array, encrypter: MteMkeEnc) {
+  const encryptResult = encrypter.encode(payload);
+  validateStatusIsSuccess(encryptResult.status, encrypter);
+  return encryptResult.arr!;
 }
 
 /**
  * MKE encrypt a Uint8Array and return the encrypted value as a Base64 string.
  * @param payload A Uint8Array to MKE encrypt.
  * @param encrypter An instance of an MKE encrypter.
- * @param mteBase An instance of MTE Base.
  * @returns An MKE encrypted Base64 string.
  */
-export function mkeEncryptB64(
-  payload: Uint8Array,
-  encryptor: MteMkeEnc,
-  mteBase: MteBase
-) {
-  const encodeResult = encryptor.encodeB64(payload);
-  validateStatusIsSuccess(encodeResult.status, mteBase);
-  return encodeResult.str!;
+export function mkeEncryptB64(payload: Uint8Array, encrypter: MteMkeEnc) {
+  const encryptResult = encrypter.encodeB64(payload);
+  validateStatusIsSuccess(encryptResult.status, encrypter);
+  return encryptResult.str!;
 }
 
 /**
  * MKE encrypt a plaintext string and return the encrypted value as a Uint8Array.
  * @param payload A plaintext string to MKE encrypt.
  * @param encrypter An instance of an MKE encrypter.
- * @param mteBase An instance of MTE Base.
  * @returns An MKE encrypted Uint8Array.
  */
-export function mkeEncryptStr(
-  payload: string,
-  encrypter: MteMkeEnc,
-  mteBase: MteBase
-) {
-  const encodeResult = encrypter.encodeStr(payload);
-  validateStatusIsSuccess(encodeResult.status, mteBase);
-  return encodeResult.arr!;
+export function mkeEncryptStr(payload: string, encrypter: MteMkeEnc) {
+  const encryptResult = encrypter.encodeStr(payload);
+  validateStatusIsSuccess(encryptResult.status, encrypter);
+  return encryptResult.arr!;
 }
 
 /**
  * MKE encrypt a plaintext string and return the encrypted value as a Base64 string.
  * @param payload A plaintext string to MKE encrypt.
  * @param encrypter An instance of an MKE encrypter.
- * @param mteBase An instance of MTE Base.
  * @returns An MKE encrypted Base64 string.
  */
-export function mkeEncryptStrB64(
-  payload: string,
-  encoder: MteMkeEnc,
-  mteBase: MteBase
-) {
-  const encodeResult = encoder.encodeStrB64(payload);
-  validateStatusIsSuccess(encodeResult.status, mteBase);
-  return encodeResult.str!;
+export function mkeEncryptStrB64(payload: string, encrypter: MteMkeEnc) {
+  const encryptResult = encrypter.encodeStrB64(payload);
+  validateStatusIsSuccess(encryptResult.status, encrypter);
+  return encryptResult.str!;
 }

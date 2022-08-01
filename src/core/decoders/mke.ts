@@ -1,9 +1,8 @@
-import { MteMkeDec, MteWasm, MteBase } from "mte";
+import { MteMkeDec, MteWasm } from "mte";
 import { validateStatusIsSuccess } from "../common";
 
 type MkeDecoderOptions = {
   mteWasm: MteWasm;
-  mteBase: MteBase;
   personalization: string;
   nonce: string | number;
   entropy:
@@ -20,93 +19,73 @@ type MkeDecoderOptions = {
  */
 export function createMkeDecoder(options: MkeDecoderOptions) {
   // create decoder
-  const mteDecoder = MteMkeDec.fromdefault(options.mteWasm);
+  const decryptor = MteMkeDec.fromdefault(options.mteWasm);
 
   // handle entropy
   if (options.entropy instanceof Uint8Array) {
-    mteDecoder.setEntropyArr(options.entropy);
+    decryptor.setEntropyArr(options.entropy);
   } else {
     if (options.entropy.encoding === "B64") {
-      mteDecoder.setEntropyB64(options.entropy.value);
+      decryptor.setEntropyB64(options.entropy.value);
     } else {
-      mteDecoder.setEntropyStr(options.entropy.value);
+      decryptor.setEntropyStr(options.entropy.value);
     }
   }
 
   // handle nonce
-  mteDecoder.setNonce(String(options.nonce));
+  decryptor.setNonce(String(options.nonce));
 
   // handle instantiation
-  const initResult = mteDecoder.instantiate(options.personalization);
-  validateStatusIsSuccess(initResult, options.mteBase);
+  const initResult = decryptor.instantiate(options.personalization);
+  validateStatusIsSuccess(initResult, decryptor);
 
-  return mteDecoder;
+  return decryptor;
 }
 
 /**
  * MKE decrypt a Uint8Array and return the decrypted value as a Uint8Array.
  * @param payload A Uint8Array to MKE decrypt.
  * @param decrypter An instance of an MKE decrypter.
- * @param mteBase An instance of MTE Base.
  * @returns An MKE decrypted Uint8Array.
  */
-export function mkeDecrypt(
-  payload: Uint8Array,
-  decrypter: MteMkeDec,
-  mteBase: MteBase
-) {
-  const decodeResult = decrypter.decode(payload);
-  validateStatusIsSuccess(decodeResult.status, mteBase);
-  return decodeResult.arr!;
+export function mkeDecrypt(payload: Uint8Array, decrypter: MteMkeDec) {
+  const decryptResult = decrypter.decode(payload);
+  validateStatusIsSuccess(decryptResult.status, decrypter);
+  return decryptResult.arr!;
 }
 
 /**
  * MKE decrypt a Uint8Array and return the decrypted value as a plaintext string.
  * @param payload A Uint8Array to MKE decrypt.
  * @param decrypter An instance of an MKE decrypter.
- * @param mteBase An instance of MTE Base.
  * @returns An MKE decrypted plaintext string.
  */
-export function mkeDecryptStr(
-  payload: Uint8Array,
-  decryptor: MteMkeDec,
-  mteBase: MteBase
-) {
-  const decodeResult = decryptor.decodeStr(payload);
-  validateStatusIsSuccess(decodeResult.status, mteBase);
-  return decodeResult.str!;
+export function mkeDecryptStr(payload: Uint8Array, decrypter: MteMkeDec) {
+  const decryptResult = decrypter.decodeStr(payload);
+  validateStatusIsSuccess(decryptResult.status, decrypter);
+  return decryptResult.str!;
 }
 
 /**
  * MKE decrypt a B64 string and return the decrypted value as a Uint8Array.
  * @param payload A plaintext string to MKE decrypt.
  * @param decrypter An instance of an MKE decrypter.
- * @param mteBase An instance of MTE Base.
  * @returns An MKE decrypted Uint8Array.
  */
-export function mkedecryptB64(
-  payload: string,
-  decrypter: MteMkeDec,
-  mteBase: MteBase
-) {
-  const decodeResult = decrypter.decodeB64(payload);
-  validateStatusIsSuccess(decodeResult.status, mteBase);
-  return decodeResult.arr!;
+export function mkedecryptB64(payload: string, decrypter: MteMkeDec) {
+  const decryptResult = decrypter.decodeB64(payload);
+  validateStatusIsSuccess(decryptResult.status, decrypter);
+  return decryptResult.arr!;
 }
 
 /**
  * MKE decrypt a B64 string and return the decrypted value as a plaintext string.
  * @param payload A plaintext string to MKE decrypt.
  * @param decrypter An instance of an MKE decrypter.
- * @param mteBase An instance of MTE Base.
  * @returns An MKE decrypted Base64 string.
  */
-export function mkeDecryptStrB64(
-  payload: string,
-  decoder: MteMkeDec,
-  mteBase: MteBase
-) {
-  const decodeResult = decoder.decodeStrB64(payload);
-  validateStatusIsSuccess(decodeResult.status, mteBase);
-  return decodeResult.str!;
+export function mkeDecryptStrB64(payload: string, decrypter: MteMkeDec) {
+  const decryptResult = decrypter.decodeStrB64(payload);
+  validateStatusIsSuccess(decryptResult.status, decrypter);
+  return decryptResult.str!;
 }
