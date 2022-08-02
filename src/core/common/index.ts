@@ -35,14 +35,32 @@ export function initMteLicense(
  * Validate that an MTE status is successful. If the status is NOT successful, throw an error.
  * @param status An MTE status.
  * @param mteBase An instance of MTE Base.
- *
- * TODO - there could be an warning message, not an error, but a warning.
+ * @param onError A function that will be called in the event of an error. Provides the error name and description.
+ * @param onWarning A function that will be called in the event of an error. Provides the error name and description.
  */
-export function validateStatusIsSuccess(status: MteStatus, mteBase: MteBase) {
+export function validateStatusIsSuccess(
+  status: MteStatus,
+  mteBase: MteBase,
+  onError?: (statusName: string, statusDescription: string) => void,
+  onWarning?: (statusName: string, statusDescription: string) => void
+) {
   if (status !== MteStatus.mte_status_success) {
+    const isError = mteBase.statusIsError(status);
     const statusName = mteBase.getStatusName(status);
     const description = mteBase.getStatusDescription(status);
-    throw new Error(statusName + ": " + description);
+    if (isError) {
+      if (onError) {
+        onError(statusName, description);
+      } else {
+        throw new Error(statusName + ": " + description);
+      }
+    } else {
+      if (onWarning) {
+        onWarning(statusName, description);
+      } else {
+        console.warn(statusName, description);
+      }
+    }
   }
 }
 
