@@ -36,21 +36,22 @@ const cache = {
 /**
  * Define default options
  * passThrough - when true, no encoding/decoding will occur (good for development)
- * keepAlive - keeps and encoding alive for this many ms before saving state and putting in cache
+ * keepAlive - keeps an encoder/decoder alive for this many ms before saving state and putting in cache
  * useMkeAboveSize - automatically uses MKE when the payload is larger than this value
  */
 const _SETTINGS: DefaultSettings = {
   passThrough: false,
-  keepAlive: 0,
-  useMkeAboveSize: 0,
-  stateType: "Uint8Array",
   encoderType: "MKE",
+  saveStateAs: "Uint8Array",
   fixedLength: 0,
   encoderOutput: "B64",
   decoderType: "MKE",
   decoderOutput: "str",
   timestampWindow: 0,
   sequenceWindow: 0,
+
+  keepAlive: 0,
+  useMkeAboveSize: 0,
 };
 
 /**
@@ -80,7 +81,7 @@ export async function instantiateMteWasm(
   _SETTINGS.keepAlive = options.keepAlive || _SETTINGS.keepAlive;
   _SETTINGS.useMkeAboveSize =
     options.useMkeAboveSize || _SETTINGS.useMkeAboveSize;
-  _SETTINGS.stateType = options.stateType || _SETTINGS.stateType;
+  _SETTINGS.saveStateAs = options.saveStateAs || _SETTINGS.saveStateAs;
   _SETTINGS.encoderType = options.encoderType || _SETTINGS.encoderType;
   _SETTINGS.fixedLength = options.fixedLength || _SETTINGS.fixedLength;
   _SETTINGS.encoderOutput = options.encoderOutput || _SETTINGS.encoderOutput;
@@ -131,7 +132,7 @@ export async function createEncoder(options: CreateEncoderOptions) {
   });
 
   // save encoder state
-  const state = getMteState(encoder, _SETTINGS.stateType);
+  const state = getMteState(encoder, _SETTINGS.saveStateAs);
 
   // save mte state in cache
   await cache.saveState(options.id, state);
@@ -159,7 +160,7 @@ export async function createDecoder(options: CreateDecoderOptions) {
   });
 
   // save decoder state
-  const state = getMteState(decoder, _SETTINGS.stateType);
+  const state = getMteState(decoder, _SETTINGS.saveStateAs);
 
   // save mte state
   await cache.saveState(options.id, state);
@@ -277,7 +278,7 @@ export async function mteEncode(
   validateStatusIsSuccess(encodeResult.status, encoder);
 
   // get encoder state
-  const state = getMteState(encoder, _SETTINGS.stateType);
+  const state = getMteState(encoder, _SETTINGS.saveStateAs);
 
   // save encoder state in cache
   await cache.saveState(options.id, state);
@@ -367,7 +368,7 @@ export async function mteDecode(
   // check decode result
   validateStatusIsSuccess(decodeResult.status, decoder);
 
-  const state = getMteState(decoder, _SETTINGS.stateType);
+  const state = getMteState(decoder, _SETTINGS.saveStateAs);
   await cache.saveState(options.id, state);
 
   // return result

@@ -6,7 +6,7 @@ export type DefaultSettings = {
   passThrough: boolean;
   keepAlive: number;
   useMkeAboveSize: number;
-  stateType: "Uint8Array" | "B64";
+  saveStateAs: "Uint8Array" | "B64";
   encoderType: "MKE" | "MTE" | "FLEN";
   fixedLength: number;
   decoderType: "MKE" | "MTE";
