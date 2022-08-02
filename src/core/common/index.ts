@@ -36,7 +36,7 @@ export function initMteLicense(
  * @param status An MTE status.
  * @param mteBase An instance of MTE Base.
  * @param onError A function that will be called in the event of an error. Provides the error name and description.
- * @param onWarning A function that will be called in the event of an error. Provides the error name and description.
+ * @param onWarning A function that will be called in the event of an warning. Provides the warning name and description.
  */
 export function validateStatusIsSuccess(
   status: MteStatus,
