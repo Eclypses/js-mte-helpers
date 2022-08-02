@@ -3,11 +3,12 @@
   "version": "2.1.1-beta",
   "description": "The goal of this package is to make MTE as simple and easy to use as possible.",
   "scripts": {
+    "rimraf": "rimraf ./core ./dist ./esm ./managed ./types ./utils",
     "dev": "esbuild src/managed/index.ts --watch --outdir=dist/cjs --format=cjs",
     "build:cjs": "tsc --project tsconfig.cjs.json",
     "build:esm": "tsc --project tsconfig.esm.json",
     "build:types": "tsc --declaration --outdir . && tsc --declaration --outdir esm",
-    "build": "npm run build:cjs && npm run build:esm && npm run build:types"
+    "build": "npm run rimraf && npm run build:cjs && npm run build:esm && npm run build:types"
   },
   "keywords": [],
   "author": "Eclypses Inc.",
@@ -30,6 +31,7 @@
   "devDependencies": {
     "esbuild": "^0.14.42",
     "esbuild-windows-64": "^0.14.43",
+    "rimraf": "^3.0.2",
     "typescript": "^4.7.3"
   },
   "peerDependencies": {
