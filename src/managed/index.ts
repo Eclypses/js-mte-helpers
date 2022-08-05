@@ -17,7 +17,12 @@ import {
   restoreMteState,
   validateStatusIsSuccess,
 } from "../core";
-import { DefaultSettings } from "../types";
+import { DefaultSettings, EncDec } from "../types";
+import {
+  deleteAliveItem,
+  keepItemAlive,
+  takeAliveItem,
+} from "./keep-alive-store";
 import { setItem, takeItem } from "./memory-store";
 
 /**
@@ -49,7 +54,6 @@ const _SETTINGS: DefaultSettings = {
   decoderOutput: "str",
   timestampWindow: 0,
   sequenceWindow: 0,
-
   keepAlive: 0,
   useMkeAboveSize: 0,
 };
@@ -219,43 +223,57 @@ export async function mteEncode(
   } & Partial<Omit<DefaultSettings, "defaultStateType">>
 ) {
   // check for passthrough
-  if (options.passThrough) {
+  if (options.passThrough || _SETTINGS.passThrough) {
     return payload;
   }
 
-  const savedState = await cache.takeState<"string" | "Uint8Array">(options.id);
-  if (!savedState) {
-    throw Error(`Encoder state not found with id "${options.id}"`);
-  }
+  // create an encoder
+  const encoder = await (async () => {
+    // encoder get from keep alive cache
+    if (options.keepAlive || _SETTINGS.keepAlive) {
+      const _encoder = takeAliveItem(options.id);
+      if (_encoder) {
+        return _encoder as MteEnc | MteFlenEnc | MteMkeEnc;
+      }
+    }
 
-  // create encoder of the requested type
-  let encoder: MteEnc | MteFlenEnc | MteMkeEnc;
-  const type = options.type || _SETTINGS.encoderType;
-  switch (type) {
-    case "MTE": {
-      encoder = MteEnc.fromdefault(mteWasm);
-      break;
+    // get encoder state frp, cache
+    const state = await cache.takeState<"string" | "Uint8Array">(options.id);
+    if (!state) {
+      throw Error(`Encoder state not found with id "${options.id}"`);
     }
-    case "MKE": {
-      encoder = MteMkeEnc.fromdefault(mteWasm);
-      break;
-    }
-    case "FLEN": {
-      encoder = MteFlenEnc.fromdefault(
-        mteWasm,
-        options.fixedLength || _SETTINGS.fixedLength
-      );
-      break;
-    }
-    default: {
-      throw Error(
-        `Unknown encoder type was request. Expected type of MTE, MKE< or FLEN, but received "${type}".`
-      );
-    }
-  }
 
-  // restore encoder
-  restoreMteState(encoder, savedState);
+    // create encoder of the requested type
+    let _encoder: MteEnc | MteFlenEnc | MteMkeEnc;
+    const type = options.type || _SETTINGS.encoderType;
+    switch (type) {
+      case "MTE": {
+        _encoder = MteEnc.fromdefault(mteWasm);
+        break;
+      }
+      case "MKE": {
+        _encoder = MteMkeEnc.fromdefault(mteWasm);
+        break;
+      }
+      case "FLEN": {
+        _encoder = MteFlenEnc.fromdefault(
+          mteWasm,
+          options.fixedLength || _SETTINGS.fixedLength
+        );
+        break;
+      }
+      default: {
+        throw Error(
+          `Unknown encoder type was request. Expected type of MTE, MKE, or FLEN, but received "${type}".`
+        );
+      }
+    }
+
+    // restore encoder from state
+    restoreMteState(_encoder, state);
+
+    return _encoder;
+  })();
 
   // encode data
   let encodeResult: MteArrStatus | MteStrStatus;
@@ -277,15 +295,43 @@ export async function mteEncode(
   // check encode result
   validateStatusIsSuccess(encodeResult.status, encoder);
 
-  // get encoder state
-  const state = getMteState(encoder, _SETTINGS.saveStateAs);
+  // keep encoder alive, or save state to cache
+  await (async () => {
+    // get encoder state
+    const state = getMteState(
+      encoder,
+      options.saveStateAs || _SETTINGS.saveStateAs
+    );
 
-  // save encoder state in cache
-  await cache.saveState(options.id, state);
+    // keepAlive, with timeout to move to cache storage
+    if (options.keepAlive || _SETTINGS.keepAlive) {
+      keepItemAlive(
+        options.id,
+        encoder,
+        setTimeout(() => {
+          cache
+            .saveState(options.id, state)
+            .then(() => {
+              deleteAliveItem(options.id);
+              encoder.uninstantiate();
+              encoder.destruct();
+            })
+            .catch((err) => {
+              console.error("Failed to save MTE state to cache.\n", err);
+            });
+        }, options.keepAlive || _SETTINGS.keepAlive)
+      );
+      return true;
+    }
 
-  // destroy encoder
-  encoder.uninstantiate();
-  encoder.destruct();
+    // else, just save to state cache
+    await cache.saveState(options.id, state);
+    // destroy encoder
+    encoder.uninstantiate();
+    encoder.destruct();
+
+    return true;
+  })();
 
   // return result
   return "str" in encodeResult ? encodeResult.str : encodeResult.arr;
@@ -300,9 +346,7 @@ export function mteDecode(
     type?: "MTE" | "MKE";
     id: any;
     output?: "str";
-    timestampWindow?: number;
-    sequenceWindow?: number;
-  }
+  } & Partial<Omit<DefaultSettings, "defaultStateType">>
 ): Promise<string>;
 export function mteDecode(
   payload: string | Uint8Array,
@@ -310,9 +354,7 @@ export function mteDecode(
     type?: "MTE" | "MKE";
     id: any;
     output?: "Uint8Array";
-    timestampWindow?: number;
-    sequenceWindow?: number;
-  }
+  } & Partial<Omit<DefaultSettings, "defaultStateType">>
 ): Promise<Uint8Array>;
 export async function mteDecode(
   payload: string | Uint8Array,
@@ -320,33 +362,45 @@ export async function mteDecode(
     type?: "MTE" | "MKE";
     id: any;
     output?: "str" | "Uint8Array";
-    timestampWindow?: number;
-    sequenceWindow?: number;
-  }
+  } & Partial<Omit<DefaultSettings, "defaultStateType">>
 ) {
   // check for passthrough
-  if (_SETTINGS.passThrough) {
+  if (options.passThrough || _SETTINGS.passThrough) {
     return payload;
   }
 
-  const savedState = await cache.takeState<string>(options.id);
-  if (!savedState) {
-    throw Error(`Decoder not found with identifier "${options.id}"`);
-  }
+  // create a decoder
+  const decoder = await (async () => {
+    // get from keep alive cache
+    if (options.keepAlive || _SETTINGS.keepAlive) {
+      const _decoder = takeAliveItem(options.id);
+      if (_decoder) {
+        return _decoder as MteDec | MteMkeDec;
+      }
+    }
 
-  // create decoder of the requested type
-  let decoder: MteDec | MteMkeDec;
-  const type = options.type || _SETTINGS.decoderType;
-  const tsw = options.timestampWindow || _SETTINGS.timestampWindow;
-  const sw = options.sequenceWindow || _SETTINGS.sequenceWindow;
-  if (type === "MTE") {
-    decoder = MteDec.fromdefault(mteWasm, String(tsw), sw);
-  } else {
-    decoder = MteMkeDec.fromdefault(mteWasm, String(tsw), sw);
-  }
+    // get decoder state from, cache
+    const state = await cache.takeState<"string" | "Uint8Array">(options.id);
+    if (!state) {
+      throw Error(`Encoder state not found with id "${options.id}"`);
+    }
 
-  // restore decoder
-  decoder.restoreStateB64(savedState);
+    // create decoder of the requested type
+    let _decoder: MteDec | MteMkeDec;
+    const type = options.type || _SETTINGS.decoderType;
+    const tsw = options.timestampWindow || _SETTINGS.timestampWindow;
+    const sw = options.sequenceWindow || _SETTINGS.sequenceWindow;
+    if (type === "MTE") {
+      _decoder = MteDec.fromdefault(mteWasm, String(tsw), sw);
+    } else {
+      _decoder = MteMkeDec.fromdefault(mteWasm, String(tsw), sw);
+    }
+
+    // restore decoder from state
+    restoreMteState(_decoder, state);
+
+    return _decoder;
+  })();
 
   // decode data
   let decodeResult: MteArrStatus | MteStrStatus;
@@ -368,8 +422,43 @@ export async function mteDecode(
   // check decode result
   validateStatusIsSuccess(decodeResult.status, decoder);
 
-  const state = getMteState(decoder, _SETTINGS.saveStateAs);
-  await cache.saveState(options.id, state);
+  // keep decoder alive, or save state to cache
+  await (async () => {
+    // get decoder state
+    const state = getMteState(
+      decoder,
+      options.saveStateAs || _SETTINGS.saveStateAs
+    );
+
+    // keepAlive, with timeout to move to cache storage
+    if (options.keepAlive || _SETTINGS.keepAlive) {
+      keepItemAlive(
+        options.id,
+        decoder,
+        setTimeout(() => {
+          cache
+            .saveState(options.id, state)
+            .then(() => {
+              deleteAliveItem(options.id);
+              decoder.uninstantiate();
+              decoder.destruct();
+            })
+            .catch((err) => {
+              console.error("Failed to save MTE state to cache.\n", err);
+            });
+        }, options.keepAlive || _SETTINGS.keepAlive)
+      );
+      return true;
+    }
+
+    // else, just save to state cache
+    await cache.saveState(options.id, state);
+    // destroy decoder
+    decoder.uninstantiate();
+    decoder.destruct();
+
+    return true;
+  })();
 
   // return result
   return "str" in decodeResult ? decodeResult.str : decodeResult.arr;

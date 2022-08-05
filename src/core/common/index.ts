@@ -8,8 +8,6 @@ import {
   MteStatus,
 } from "mte";
 
-type EncDec = MteEnc | MteFlenEnc | MteMkeEnc | MteDec | MteMkeDec;
-
 /**
  * Initialize MTE with a company name and license key.
  * @param licenseKey The license key.

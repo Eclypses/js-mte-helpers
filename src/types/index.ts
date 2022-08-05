@@ -1,4 +1,4 @@
-import { MteWasm, MteBase } from "mte";
+import { MteEnc, MteFlenEnc, MteMkeEnc, MteDec, MteMkeDec } from "mte";
 
 export type MteState = string | Uint8Array;
 
@@ -15,3 +15,5 @@ export type DefaultSettings = {
   timestampWindow: number;
   sequenceWindow: number;
 };
+
+export type EncDec = MteEnc | MteFlenEnc | MteMkeEnc | MteDec | MteMkeDec;
