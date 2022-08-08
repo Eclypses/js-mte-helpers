@@ -1,9 +1,9 @@
-core/
-dist/
-esm/
-managed/
-types/
-utils/
+/core/
+/dist/
+/esm/
+/managed
+/types/
+/utils/
 
 node_modules/
 *.tgz
