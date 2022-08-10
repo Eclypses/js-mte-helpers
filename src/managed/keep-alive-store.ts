@@ -32,6 +32,7 @@ export function takeAliveItem(id: any): EncDec | undefined {
   return item.value;
 }
 
+// delete an item from the store
 export function deleteAliveItem(id: any) {
   store.delete(id);
 }

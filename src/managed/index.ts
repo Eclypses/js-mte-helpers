@@ -17,7 +17,7 @@ import {
   restoreMteState,
   validateStatusIsSuccess,
 } from "../core";
-import { DefaultSettings, EncDec } from "../types";
+import { GenericSettings, EncoderSettings, DecoderSettings } from "../types";
 import {
   deleteAliveItem,
   keepItemAlive,
@@ -42,9 +42,8 @@ const cache = {
  * Define default options
  * passThrough - when true, no encoding/decoding will occur (good for development)
  * keepAlive - keeps an encoder/decoder alive for this many ms before saving state and putting in cache
- * useMkeAboveSize - automatically uses MKE when the payload is larger than this value
  */
-const _SETTINGS: DefaultSettings = {
+const _SETTINGS: GenericSettings & EncoderSettings & DecoderSettings = {
   passThrough: false,
   encoderType: "MKE",
   saveStateAs: "Uint8Array",
@@ -55,7 +54,6 @@ const _SETTINGS: DefaultSettings = {
   timestampWindow: 0,
   sequenceWindow: 0,
   keepAlive: 0,
-  useMkeAboveSize: 0,
 };
 
 /**
@@ -66,7 +64,9 @@ export async function instantiateMteWasm(
   options: {
     licenseKey: string;
     licenseCompany: string;
-  } & Partial<typeof cache & DefaultSettings>
+  } & Partial<
+    typeof cache & GenericSettings & EncoderSettings & DecoderSettings
+  >
 ) {
   /**
    * If user provided their own state functions, use them.
@@ -83,8 +83,6 @@ export async function instantiateMteWasm(
    */
   _SETTINGS.passThrough = options.passThrough || _SETTINGS.passThrough;
   _SETTINGS.keepAlive = options.keepAlive || _SETTINGS.keepAlive;
-  _SETTINGS.useMkeAboveSize =
-    options.useMkeAboveSize || _SETTINGS.useMkeAboveSize;
   _SETTINGS.saveStateAs = options.saveStateAs || _SETTINGS.saveStateAs;
   _SETTINGS.encoderType = options.encoderType || _SETTINGS.encoderType;
   _SETTINGS.fixedLength = options.fixedLength || _SETTINGS.fixedLength;
@@ -180,13 +178,13 @@ export async function createDecoder(options: CreateDecoderOptions) {
 export function mteEncode(
   payload: string | Uint8Array,
   options: { type?: "MTE" | "MKE"; id: any; output?: "B64" } & Partial<
-    Omit<DefaultSettings, "defaultStateType">
+    GenericSettings & EncoderSettings
   >
 ): Promise<string>;
 export function mteEncode(
   payload: string | Uint8Array,
   options: { type?: "MTE" | "MKE"; id: any; output?: "Uint8Array" } & Partial<
-    Omit<DefaultSettings, "defaultStateType">
+    GenericSettings & EncoderSettings
   >
 ): Promise<Uint8Array>;
 export function mteEncode(
@@ -196,7 +194,7 @@ export function mteEncode(
     fixedLength?: number;
     id: any;
     output?: "B64";
-  } & Partial<Omit<DefaultSettings, "defaultStateType">>
+  } & Partial<GenericSettings & EncoderSettings>
 ): Promise<string>;
 export function mteEncode(
   payload: string | Uint8Array,
@@ -205,7 +203,7 @@ export function mteEncode(
     fixedLength?: number;
     id: any;
     output?: "Uint8Array";
-  } & Partial<Omit<DefaultSettings, "defaultStateType">>
+  } & Partial<GenericSettings & EncoderSettings>
 ): Promise<Uint8Array>;
 export async function mteEncode(
   payload: string | Uint8Array,
@@ -220,7 +218,7 @@ export async function mteEncode(
   ) & {
     id: any;
     output?: "Uint8Array" | "B64";
-  } & Partial<Omit<DefaultSettings, "defaultStateType">>
+  } & Partial<GenericSettings & EncoderSettings>
 ) {
   // check for passthrough
   if (options.passThrough || _SETTINGS.passThrough) {
@@ -346,7 +344,7 @@ export function mteDecode(
     type?: "MTE" | "MKE";
     id: any;
     output?: "str";
-  } & Partial<Omit<DefaultSettings, "defaultStateType">>
+  } & Partial<GenericSettings & DecoderSettings>
 ): Promise<string>;
 export function mteDecode(
   payload: string | Uint8Array,
@@ -354,7 +352,7 @@ export function mteDecode(
     type?: "MTE" | "MKE";
     id: any;
     output?: "Uint8Array";
-  } & Partial<Omit<DefaultSettings, "defaultStateType">>
+  } & Partial<GenericSettings & DecoderSettings>
 ): Promise<Uint8Array>;
 export async function mteDecode(
   payload: string | Uint8Array,
@@ -362,7 +360,7 @@ export async function mteDecode(
     type?: "MTE" | "MKE";
     id: any;
     output?: "str" | "Uint8Array";
-  } & Partial<Omit<DefaultSettings, "defaultStateType">>
+  } & Partial<GenericSettings & DecoderSettings>
 ) {
   // check for passthrough
   if (options.passThrough || _SETTINGS.passThrough) {

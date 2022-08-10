@@ -1,12 +1,5 @@
-import {
-  MteEnc,
-  MteDec,
-  MteFlenEnc,
-  MteMkeEnc,
-  MteMkeDec,
-  MteBase,
-  MteStatus,
-} from "mte";
+import { MteBase, MteStatus } from "mte";
+import { EncDec } from "src/types";
 
 /**
  * Initialize MTE with a company name and license key.
