@@ -1,8 +1,4 @@
-//gist.github.com/jonleighton/958841
-
-// Converts an ArrayBuffer directly to base64, without any intermediate 'convert to string then
-// use window.btoa' step. According to my tests, this appears to be a faster approach:
-// http://jsperf.com/encoding-xhr-image-data/5
+// Source: gist.github.com/jonleighton/958841
 
 /*
 MIT LICENSE
