@@ -45,11 +45,11 @@ const cache = {
  */
 const _SETTINGS: GenericSettings & EncoderSettings & DecoderSettings = {
   passThrough: false,
-  encoderType: "MKE",
+  encoderType: "MTE",
   saveStateAs: "Uint8Array",
   fixedLength: 0,
   encoderOutput: "B64",
-  decoderType: "MKE",
+  decoderType: "MTE",
   decoderOutput: "str",
   timestampWindow: 0,
   sequenceWindow: 0,
@@ -120,7 +120,7 @@ type CreateEncoderOptions = {
         encoding: "B64" | "plaintext";
       };
 };
-export async function createEncoder(options: CreateEncoderOptions) {
+export async function createMteEncoder(options: CreateEncoderOptions) {
   if (!mteWasm) {
     throw Error("MTE WASM must be instantiated before creating an encoder.");
   }
@@ -148,7 +148,7 @@ export async function createEncoder(options: CreateEncoderOptions) {
  * Create a decoder using specific instantiation values.
  */
 type CreateDecoderOptions = CreateEncoderOptions;
-export async function createDecoder(options: CreateDecoderOptions) {
+export async function createMteDecoder(options: CreateDecoderOptions) {
   if (!mteWasm) {
     throw Error("MTE WASM must be instantiated before creating a decoder.");
   }
@@ -177,15 +177,19 @@ export async function createDecoder(options: CreateDecoderOptions) {
  */
 export function mteEncode(
   payload: string | Uint8Array,
-  options: { type?: "MTE" | "MKE"; id: any; output?: "B64" } & Partial<
-    GenericSettings & EncoderSettings
-  >
+  options: {
+    type?: "MTE" | "MKE";
+    id: any;
+    output?: "B64";
+  } & Partial<GenericSettings>
 ): Promise<string>;
 export function mteEncode(
   payload: string | Uint8Array,
-  options: { type?: "MTE" | "MKE"; id: any; output?: "Uint8Array" } & Partial<
-    GenericSettings & EncoderSettings
-  >
+  options: {
+    type?: "MTE" | "MKE";
+    id: any;
+    output?: "Uint8Array";
+  } & Partial<GenericSettings>
 ): Promise<Uint8Array>;
 export function mteEncode(
   payload: string | Uint8Array,
@@ -194,7 +198,7 @@ export function mteEncode(
     fixedLength?: number;
     id: any;
     output?: "B64";
-  } & Partial<GenericSettings & EncoderSettings>
+  } & Partial<GenericSettings>
 ): Promise<string>;
 export function mteEncode(
   payload: string | Uint8Array,
@@ -203,7 +207,7 @@ export function mteEncode(
     fixedLength?: number;
     id: any;
     output?: "Uint8Array";
-  } & Partial<GenericSettings & EncoderSettings>
+  } & Partial<GenericSettings>
 ): Promise<Uint8Array>;
 export async function mteEncode(
   payload: string | Uint8Array,
@@ -344,7 +348,7 @@ export function mteDecode(
     type?: "MTE" | "MKE";
     id: any;
     output?: "str";
-  } & Partial<GenericSettings & DecoderSettings>
+  } & Partial<GenericSettings>
 ): Promise<string>;
 export function mteDecode(
   payload: string | Uint8Array,
@@ -352,7 +356,9 @@ export function mteDecode(
     type?: "MTE" | "MKE";
     id: any;
     output?: "Uint8Array";
-  } & Partial<GenericSettings & DecoderSettings>
+    timestampWindow: number;
+    sequenceWindow: number;
+  } & Partial<GenericSettings>
 ): Promise<Uint8Array>;
 export async function mteDecode(
   payload: string | Uint8Array,
@@ -360,7 +366,7 @@ export async function mteDecode(
     type?: "MTE" | "MKE";
     id: any;
     output?: "str" | "Uint8Array";
-  } & Partial<GenericSettings & DecoderSettings>
+  } & Partial<GenericSettings>
 ) {
   // check for passthrough
   if (options.passThrough || _SETTINGS.passThrough) {

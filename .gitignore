@@ -8,3 +8,4 @@
 node_modules/
 *.tgz
 notes.txt
+test.js
