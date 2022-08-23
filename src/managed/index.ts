@@ -11,8 +11,8 @@ import {
 } from "mte";
 import {
   initMteLicense,
-  createMteEncoder,
-  createMteDecoder,
+  createMteEncoder as createMteEncoderCore,
+  createMteDecoder as createMteDecoderCore,
   getMteState,
   restoreMteState,
   validateStatusIsSuccess,
@@ -126,7 +126,7 @@ export async function createMteEncoder(options: CreateEncoderOptions) {
   }
 
   // create new encoder
-  const encoder = createMteEncoder({
+  const encoder = createMteEncoderCore({
     mteWasm,
     personalization: options.personalization,
     nonce: options.nonce,
@@ -154,7 +154,7 @@ export async function createMteDecoder(options: CreateDecoderOptions) {
   }
 
   // create new decoder
-  const decoder = createMteDecoder({
+  const decoder = createMteDecoderCore({
     mteWasm: mteWasm,
     personalization: options.personalization,
     nonce: options.nonce,
@@ -222,7 +222,7 @@ export async function mteEncode(
   ) & {
     id: any;
     output?: "Uint8Array" | "B64";
-  } & Partial<GenericSettings & EncoderSettings>
+  } & Partial<GenericSettings>
 ) {
   // check for passthrough
   if (options.passThrough || _SETTINGS.passThrough) {
@@ -240,7 +240,7 @@ export async function mteEncode(
     }
 
     // get encoder state frp, cache
-    const state = await cache.takeState<"string" | "Uint8Array">(options.id);
+    const state = await cache.takeState<string | Uint8Array>(options.id);
     if (!state) {
       throw Error(`Encoder state not found with id "${options.id}"`);
     }
@@ -260,6 +260,7 @@ export async function mteEncode(
       case "FLEN": {
         _encoder = MteFlenEnc.fromdefault(
           mteWasm,
+          // @ts-ignore
           options.fixedLength || _SETTINGS.fixedLength
         );
         break;
@@ -348,6 +349,8 @@ export function mteDecode(
     type?: "MTE" | "MKE";
     id: any;
     output?: "str";
+    timestampWindow: number;
+    sequenceWindow: number;
   } & Partial<GenericSettings>
 ): Promise<string>;
 export function mteDecode(
@@ -366,6 +369,8 @@ export async function mteDecode(
     type?: "MTE" | "MKE";
     id: any;
     output?: "str" | "Uint8Array";
+    timestampWindow: number;
+    sequenceWindow: number;
   } & Partial<GenericSettings>
 ) {
   // check for passthrough
