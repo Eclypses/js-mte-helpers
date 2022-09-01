@@ -268,17 +268,17 @@ A plaintext string (possibly JSON), or a Uint8Array to encode.
   default: `undefined`\
   The unique identifier assigned to the encoder you want to use. Usually a string or a number.
 
-- `type`
+- `type`\
   type: `"MTE"|"FLEN"|"MKE"`\
   default: The value set in `instantiateMteWasm(options)`\
   The type of MTE encoder to use for this encode operation.
 
-- `fixedLength`
+- `fixedLength`\
   type: `number`\
   default: The value set in `instantiateMteWasm(options)`\
   The fixed-length to use for this Fixed-Length MTE encode operations. Only applies to fixed-length encodes.
 
-- `output`
+- `output`\
   type: `"Uint8Array"|"B64"`
   default: The value set in `instantiateMteWasm(options)`\
   The default output type to use for encode operations.
@@ -326,12 +326,12 @@ A Base64 encoded string, or a Uint8Array to decode.
   default: `undefined`\
   The unique identifier assigned to the decoder you want to use. Usually a string or a number.
 
-- `type`
+- `type`\
   type: `"MTE"|"MKE"`\
   default: The value set in `instantiateMteWasm(options)`\
   The type of MTE decoder to use for this decode operation. Must match the type used to encode the payload.
 
-- `output`
+- `output`\
   type: `"Uint8Array"|"B64"`
   default: The value set in `instantiateMteWasm(options)`\
   The default output type to use for decode operations.
