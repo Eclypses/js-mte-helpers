@@ -158,4 +158,4 @@ await instantiateMteWasm({
 });
 ```
 
-[Read the API Reference](./guides/api-reference/managed.md)
+[API Reference](./guides/api-reference/managed.md)
