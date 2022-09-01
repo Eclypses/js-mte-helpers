@@ -47,14 +47,14 @@ To use MTE, create an MTE Encoder and an MTE Decoder using the same initializati
 To create an encoder or decoder, you must provide three initialization values, and a unique ID. To create an encoder/decoder pair, the initialization values must match.
 
 1. **Personalization String**
-   - A string that is unique to this encoder/decoder relationship. This can be a GUID, an email address, user ID, or any string that is typically unique.
+   - A string that is unique to this encoder/decoder pair. This can be a GUID, an email address, user ID, or any unique string.
 2. **Nonce**
    - A string of integers. Example: `"1238976123876123"`
 3. **Entropy**
-   - A random value. Values higher in entropy result in better security.
-   - [ECDH Entropy Guide](./entropy.md)
+   - A random value. Higher entropy results in better security.
+   - [ECDH Entropy Guide](./guides/ecdh-entropy-guide.md)
 4. **ID**
-   - A unique identifier that is assigned to the encoder or decoder. The ID should be absolutely unique; it should not match any other encoder or decoder.
+   - A unique identifier that is assigned to the encoder or decoder. The ID should be absolutely unique; it should NOT match any other encoder or decoder.
 
 ```js
 import { createMteEncoder, createMteDecoder } from "mte-helpers";
@@ -82,13 +82,13 @@ await createMteDecoder({
 });
 ```
 
-[Read the API Reference](./guides/api-reference/managed.md)
+[API Reference](./guides/api-reference/managed.md)
 
-TODO: Create guide on creating initialization values and exchanging them between a client and server.
+[Client-to-Server Pairing Guide](./guides/client-server-pairing-guide.md)
 
 ## Encoding Data
 
-MTE can encode strings, like JSON, or binary data from a Uint8Array, which might represent a file or a chunk of a file. To encode data, call the encode function and pass in the data to encode, as well as the ID of the encoder to use.
+MTE can encode strings, including JSON, or binary data from a Uint8Array, which might represent a file or a chunk of a file. To encode data, call the encode function and pass in the data to encode, as well as the ID of the encoder to use.
 
 ```js
 import { mteEncode } from "mte-helpers";
@@ -97,14 +97,14 @@ import { mteEncode } from "mte-helpers";
 const encoded = await mteEncode("P@ssw0rd!", { id: "encoder_001" });
 ```
 
-[Read the API Reference](./guides/api-reference/managed.md)
+[API Reference](./guides/api-reference/managed.md)
 
 ## Decoding Data
 
 To decode data, call the decode function and pass in the data to decode, as well as the ID of the decoder to use. A decode will only be successful if
 
-- The decoded data comes from a paired encoder.
-- The decoder type matches the encoder type: MTE or MKE.
+- The data to decode comes from a paired encoder.
+- The decoder type matches the encoder type used to encode the data: MTE or MKE.
   - MTE Decoders can decode data that was Fixed-Length (FLEN) encoded.
 
 ```js
@@ -114,17 +114,17 @@ import { mteDecode } from "mte-helpers";
 const decoded = await mteDecode(encodedData, { id: "decoder_001" });
 ```
 
-[Read the API Reference](./guides/api-reference/managed.md)
+[API Reference](./guides/api-reference/managed.md)
 
 ## MTE State
 
-MTE encoders and decoders maintain an internal state that is changed each time they're used. Their state can be exported and saved, then used at a later time to create a new encoder or decoder with the same state. This is a key concept that allows an application to create and use an encoder/decoder only when needed, and then save their state and destroy the objects, conserving memory while the encoder/decoders are not in use.
+MTE encoders and decoders maintain an internal state that is changed each time they're used. Their state can be exported and saved, then used at a later time to create a new encoder or decoder with the same state. This is a key concept that allows an application to create and use an encoder/decoder only when needed, and then save their state and destroy the objects, in order to conserve memory while the encoder/decoders are not in use.
 
-The MTE-Helpers package manages state and the creation and destruction of encoders automatically, using an in-memory data store. However, you may choose to use another storage solution, such as Redis or Memcached. To do so, implement asynchronous getter and setter functions in the MTE initialization options.
+The MTE-Helpers package manages state and the creation and destruction of encoders/decoders automatically, using an in-memory data store. However, you may choose to use another storage solution, such as Redis or Memcached. To do so, implement asynchronous getter and setter functions in the MTE initialization options object.
 
 ### `saveState(id: any, value: string|Uint8Array): Promise<void>`
 
-A setter function that uses the unique ID of an encoder or decoder to store the value, or MTE state, in a cache.
+A setter function that uses the unique ID of an encoder or decoder to store the value, or MTE state, in cache.
 
 ```js
 async function customSaveState(id, value) {
@@ -144,7 +144,7 @@ async function customTakeState(id) {
 }
 ```
 
-Finally, pass your custom getter and setter functions into the initialization options.
+Finally, pass your custom getter and setter functions into the initialization options object.
 
 ```js
 import { instantiateMteWasm } from "mte-helpers";

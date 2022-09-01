@@ -8,7 +8,7 @@ ECDH entropy should be considered in a few steps:
 
 1. Both parties generate a pair of public and private keys.
 2. Both parties exchange public keys.
-3. Both parties use their own keys PLUS the other party's public to generate a new value; our entropy value!
+3. Both parties use their own keys and the other party's public key to generate a new value; our entropy value!
 
 <br/>
 <center>

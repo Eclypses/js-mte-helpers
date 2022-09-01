@@ -17,11 +17,11 @@ To create an encoder/decoder pairing, we need to generate matching initializatio
 </center>
 <br/>
 
-## Create initialization Values
+## 1. Create initialization Values
 
-To do this, we recommend having the client create two personalization values, and the server create two nonce values. Then, both the client and server create two sets of ECDH key pairs. Finally, exchange all values in a single API request/response.
+On the client, create two personalization strings, and two ECDH key pairs. On the server, create two nonce values and two ECDH key pairs. Finally, exchange all values in a single API request/response.
 
-You can create Personalization Strings and Nonces however you like, but below are two functions you can use to create a GUID for a personalization string and a psuedo-random number for a nonce.
+Below are two functions you can use to create a GUID for personalization strings and a random number for a nonce. However, you can create Personalization Strings and Nonces however you like.
 
 ```js
 /**
@@ -45,12 +45,48 @@ function makeNonce() {
 }
 ```
 
-For entropy, please consult the [Elliptical-Curve Diffie-Helman (ECDH) guide](./ecdh-entropy-guide.md) to learn how to use public/private key pairs to securely generate matching entropy values on the client and server.
+To create entropy using ECDH, please consult the [Elliptical-Curve Diffie-Helman (ECDH) guide](./ecdh-entropy-guide.md).
 
-## Exchange Initialization Values
+## 2. Exchange Initialization Values
+
+Simply exchange initialization values via API request. Create an API route `/mte-pair` that will handle the exchange of init values.
 
 <br/>
 <center>
   <img src="./images/exchange-init-values.png">
 </center>
 <br/>
+
+Be sure to use the foreign public keys to complete the ECDH process and create matching entropy values on both the client and the server.
+
+## 3. Create Encoders and Decoders
+
+Use the initialization values to create encoders and decoders:
+
+```js
+import { createMteEncoder, createMteDecoder } from "mte-helpers";
+
+// three initialization values
+const initValues = {
+  personalization: "83809bcf-f5fb-4a8f-919f-f572d413bf7c",
+  nonce: "558042555544002",
+  entropy: {
+    encoding: "plaintext",
+    value: "E2pMm4TagMRWd3Af6rnEXH9kFYlbsVqD",
+  },
+};
+
+// create an encoder, assign it a unique id
+await createMteEncoder({
+  id: "encoder_001",
+  ...initValues,
+});
+
+// create a decoder, with matching values and it's own unique id
+await createMteDecoder({
+  id: "decoder_001",
+  ...initValues,
+});
+```
+
+You can now MTE encode data on the client, send it to the server, and decode it there. Similarly, you can encode server responses, and decode them on the client!
