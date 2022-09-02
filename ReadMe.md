@@ -94,7 +94,7 @@ MTE can encode strings, including JSON, or binary data from a Uint8Array, which 
 import { mteEncode } from "mte-helpers";
 
 // encode data
-const encoded = await mteEncode("P@ssw0rd!", { id: "encoder_001" });
+const encodedData = await mteEncode("P@ssw0rd!", { id: "encoder_001" });
 ```
 
 [API Reference](./guides/api-reference/managed.md)
