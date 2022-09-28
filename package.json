@@ -1,6 +1,6 @@
 {
   "name": "mte-helpers",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The goal of this package is to make MTE as simple and easy to use as possible.",
   "scripts": {
     "rimraf": "rimraf ./core ./dist ./esm ./managed ./types ./utils",
@@ -37,7 +37,7 @@
     "typescript": "^4.7.3"
   },
   "peerDependencies": {
-    "mte": "^2.2.0"
+    "mte": "2.0.0 - 3.0.0"
   },
   "repository": {
     "type": "git",

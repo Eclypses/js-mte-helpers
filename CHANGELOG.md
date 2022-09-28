@@ -1,0 +1,8 @@
+- 0.1.2
+  - Add support for MTE v3.0.0.
+  - Add API Reference for Core module.
+  - Update Docs.
+- 0.1.1
+  - Update Docs.
+- 0.1.0
+  - Initial Release.
