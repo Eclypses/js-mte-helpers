@@ -1,4 +1,3 @@
-import { GenericSettings } from "./../types/index";
 import {
   MteWasm,
   MteBase,

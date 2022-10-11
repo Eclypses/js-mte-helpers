@@ -104,6 +104,11 @@ Returns a promise that resolves with `undefined`, or throw an error.
   default: `0`\
   The duration to keep an encoder or decoder alive, after which it's state is saved into cache and it is destroyed. Good for rapid encoder/decode operations, for example, when streaming or chunking data.
 
+- `logMteState`\
+  type: `boolean`\
+  default: `false`\
+  If true, MTE state will be logged to stdout after each operation; creation, encode/decode.
+
 Example:
 
 ```js
@@ -126,6 +131,7 @@ instantiateMteWasm({
   },
   passThrough: true,
   keepAlive: 1000,
+  logMteState: true,
 })
   .then(() => {
     console.log(`MTE WASM instantiated!`);
@@ -163,6 +169,11 @@ Returns a promise the resolve `undefined`, or throws an error.
   default: `undefined`\
   An entropy value to use during initialization of this encoder. The value can be a Uint8Array or a string. If the entropy value is a string, then provide an object with a `value` and `encoding` property to describe the string as either `plaintext` or `Base64`.
 
+- `logMteState`\
+  type: `boolean`\
+  default: `false`\
+  If true, MTE state will be logged to stdout after creation.
+
 ```js
 // entropy as Uint8Array
 const entropyU8 = new Uint8Array(32).fill(1);
@@ -188,6 +199,7 @@ await createMteEncoder({
     encoding: "plaintext",
     value: "fhO9s4kDACSUFt6TG88CqDBNE0DTcfOu",
   },
+  logMteState: true,
 });
 ```
 
@@ -221,6 +233,11 @@ Returns a promise the resolve `undefined`, or throws an error.
   default: `undefined`\
   An entropy value to use during initialization of this decoder. The value can be a Uint8Array or a string. If the entropy value is a string, then provide an object with a `value` and `encoding` property to describe the string as either `plaintext` or `Base64`.
 
+- `logMteState`\
+  type: `boolean`\
+  default: `false`\
+  If true, MTE state will be logged to stdout after creation.
+
 ```js
 // entropy as Uint8Array
 const entropyU8 = new Uint8Array(32).fill(1);
@@ -238,7 +255,7 @@ const entropyB64 = {
 };
 
 // create a decoder, registered with a unique ID
-await createMteEncoder({
+await createMteDecoder({
   id: "my-decoder-001",
   personalization: "b9096a46-e10e-4a9f-bfef-3c43b9092bac",
   nonce: "4053335578500636",
@@ -246,6 +263,7 @@ await createMteEncoder({
     encoding: "plaintext",
     value: "fhO9s4kDACSUFt6TG88CqDBNE0DTcfOu",
   },
+  logMteState: true,
 });
 ```
 
@@ -293,6 +311,11 @@ A plaintext string (possibly JSON), or a Uint8Array to encode.
   default: The value set in `instantiateMteWasm(options)`\
   The duration to keep an encoder or decoder alive, after which it's state is saved into cache and it is destroyed. Good for rapid encoder/decode operations, for example, when streaming or chunking data.
 
+- `logMteState`\
+  type: `boolean`\
+  default: `false`\
+  If true, MTE state will be logged to stdout after this encode event.
+
 ```js
 // encode using default options
 const encoded = mteEncode("Hello World", { id: "my-encoder-001" });
@@ -304,6 +327,7 @@ const encoded = mteEncode("Hello world!", {
   output: "Uint8Array",
   passThrough: true,
   keepAlive: 1000,
+  logMteState: true,
 });
 ```
 
@@ -356,6 +380,11 @@ A Base64 encoded string, or a Uint8Array to decode.
   default: The value set in `instantiateMteWasm(options)`\
   The duration to keep an decoder or decoder alive, after which it's state is saved into cache and it is destroyed. Good for rapid decoder/decode operations, for example, when streaming or chunking data.
 
+- `logMteState`\
+  type: `boolean`\
+  default: `false`\
+  If true, MTE state will be logged to stdout after this decode event.
+
 ```js
 // decode using default options
 const decoded = mteDecode(encoded, { id: "my-decoder-001" });
@@ -369,5 +398,6 @@ const decoded = mteDecode(encoded, {
   timestampWindow: 5000,
   passThrough: true,
   keepAlive: 1000,
+  logMteState: true,
 });
 ```
