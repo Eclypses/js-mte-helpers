@@ -19,6 +19,7 @@ export type GenericSettings = {
   passThrough: boolean;
   keepAlive: number;
   saveStateAs: "Uint8Array" | "B64";
+  logMteState: boolean;
 };
 
 export type EncDec = MteEnc | MteFlenEnc | MteMkeEnc | MteDec | MteMkeDec;

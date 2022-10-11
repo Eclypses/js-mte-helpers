@@ -1,3 +1,4 @@
+import { GenericSettings } from "./../types/index";
 import {
   MteWasm,
   MteBase,
@@ -54,6 +55,7 @@ const _SETTINGS: GenericSettings & EncoderSettings & DecoderSettings = {
   timestampWindow: 0,
   sequenceWindow: 0,
   keepAlive: 0,
+  logMteState: false,
 };
 
 /**
@@ -92,6 +94,10 @@ export async function instantiateMteWasm(
   _SETTINGS.timestampWindow =
     options.timestampWindow || _SETTINGS.timestampWindow;
   _SETTINGS.sequenceWindow = options.sequenceWindow || _SETTINGS.sequenceWindow;
+  _SETTINGS.logMteState = options.logMteState || _SETTINGS.logMteState;
+
+  // freeze this object to prevent changes to it after first instantiation
+  Object.freeze(_SETTINGS);
 
   // assign mteWasm to global variable, and instantiate wasm
   mteWasm = new MteWasm();
@@ -119,6 +125,7 @@ type CreateEncoderOptions = {
         value: string;
         encoding: "B64" | "plaintext";
       };
+  logMteState?: GenericSettings["logMteState"];
 };
 export async function createMteEncoder(options: CreateEncoderOptions) {
   if (!mteWasm) {
@@ -135,6 +142,11 @@ export async function createMteEncoder(options: CreateEncoderOptions) {
 
   // save encoder state
   const state = getMteState(encoder, _SETTINGS.saveStateAs);
+
+  // log MTE state for debugging
+  if (options.logMteState || _SETTINGS.logMteState) {
+    console.log(`Encoder State: ${state}`);
+  }
 
   // save mte state in cache
   await cache.saveState(options.id, state);
@@ -163,6 +175,11 @@ export async function createMteDecoder(options: CreateDecoderOptions) {
 
   // save decoder state
   const state = getMteState(decoder, _SETTINGS.saveStateAs);
+
+  // log MTE state for debugging
+  if (options.logMteState || _SETTINGS.logMteState) {
+    console.log(`Decoder State: ${state}`);
+  }
 
   // save mte state
   await cache.saveState(options.id, state);
@@ -239,7 +256,7 @@ export async function mteEncode(
       }
     }
 
-    // get encoder state frp, cache
+    // get encoder state from cache
     const state = await cache.takeState<string | Uint8Array>(options.id);
     if (!state) {
       throw Error(`Encoder state not found with id "${options.id}"`);
@@ -305,6 +322,11 @@ export async function mteEncode(
       encoder,
       options.saveStateAs || _SETTINGS.saveStateAs
     );
+
+    // log MTE state for debugging
+    if (options.logMteState || _SETTINGS.logMteState) {
+      console.log(`Encoder State: ${state}`);
+    }
 
     // keepAlive, with timeout to move to cache storage
     if (options.keepAlive || _SETTINGS.keepAlive) {
@@ -438,6 +460,11 @@ export async function mteDecode(
       decoder,
       options.saveStateAs || _SETTINGS.saveStateAs
     );
+
+    // log MTE state for debugging
+    if (options.logMteState || _SETTINGS.logMteState) {
+      console.log(`Decoder State: ${state}`);
+    }
 
     // keepAlive, with timeout to move to cache storage
     if (options.keepAlive || _SETTINGS.keepAlive) {
