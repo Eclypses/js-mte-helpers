@@ -16,6 +16,7 @@ import {
   getMteState,
   restoreMteState,
   validateStatusIsSuccess,
+  isDrbgReseedRequired,
 } from "../core";
 import { GenericSettings, EncoderSettings, DecoderSettings } from "../types";
 import {
@@ -294,6 +295,14 @@ export async function mteEncode(
     return _encoder;
   })();
 
+  // check if DRBG reseed is required
+  const reseedIsRequired = isDrbgReseedRequired(encoder);
+  if (reseedIsRequired) {
+    throw Error(
+      "DRBG reseed count is nearing the threshhold. Reseed is required."
+    );
+  }
+
   // encode data
   let encodeResult: MteArrStatus | MteStrStatus;
   let output = options.output || _SETTINGS.encoderOutput;
@@ -412,7 +421,7 @@ export async function mteDecode(
     // get decoder state from, cache
     const state = await cache.takeState<"string" | "Uint8Array">(options.id);
     if (!state) {
-      throw Error(`Encoder state not found with id "${options.id}"`);
+      throw Error(`Decoder state not found with id "${options.id}"`);
     }
 
     // create decoder of the requested type
@@ -431,6 +440,14 @@ export async function mteDecode(
 
     return _decoder;
   })();
+
+  // check if DRBG reseed is required
+  const reseedIsRequired = isDrbgReseedRequired(decoder);
+  if (reseedIsRequired) {
+    throw Error(
+      "DRBG reseed count is nearing the threshhold. Reseed is required."
+    );
+  }
 
   // decode data
   let decodeResult: MteArrStatus | MteStrStatus;

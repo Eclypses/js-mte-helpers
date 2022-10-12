@@ -102,3 +102,17 @@ export function getMteState(encoder: EncDec, output: "Uint8Array" | "B64") {
   }
   return state;
 }
+
+/**
+ * Check whether or not this encoder/decoder should be reseeded.
+ * @param encoder An Encoder or Decoder object.
+ * @returns {Boolean} True if the DRBG should be reseeded.
+ */
+export function isDrbgReseedRequired(encoder: EncDec) {
+  const drbg = encoder.getDrbg();
+  const threshhold = Number(
+    String(encoder.getDrbgsReseedInterval(drbg)).substring(0, 15)
+  );
+  const counter = Number(String(encoder.getReseedCounter()).substring(0, 15));
+  return Number(counter) / Number(threshhold) > 0.8;
+}

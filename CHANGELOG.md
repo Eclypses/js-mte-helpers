@@ -1,3 +1,7 @@
+- 0.1.3
+  - Update support to all versions greater than 3.0
+  - Create core function to check DRBG Reseed interval and current status.
+  - Managed package now checks DRBG Reseed status on every encode or decode event.
 - 0.1.2
   - Add support for MTE v3.0.0.
   - Add API Reference for Core module.
