@@ -248,12 +248,10 @@ export async function mteEncode(
 
   // create an encoder
   const encoder = await (async () => {
-    // encoder get from keep alive cache
-    if (options.keepAlive || _SETTINGS.keepAlive) {
-      const _encoder = takeAliveItem(options.id);
-      if (_encoder) {
-        return _encoder as MteEnc | MteFlenEnc | MteMkeEnc;
-      }
+    // check alive cache for encoder
+    const aliveEncoder = takeAliveItem(options.id);
+    if (aliveEncoder) {
+      return aliveEncoder as MteEnc | MteFlenEnc | MteMkeEnc;
     }
 
     // get encoder state from cache
@@ -410,12 +408,10 @@ export async function mteDecode(
 
   // create a decoder
   const decoder = await (async () => {
-    // get from keep alive cache
-    if (options.keepAlive || _SETTINGS.keepAlive) {
-      const _decoder = takeAliveItem(options.id);
-      if (_decoder) {
-        return _decoder as MteDec | MteMkeDec;
-      }
+    // check alive cache for decoder
+    const aliveDecoder = takeAliveItem(options.id);
+    if (aliveDecoder) {
+      return aliveDecoder as MteDec | MteMkeDec;
     }
 
     // get decoder state from, cache
