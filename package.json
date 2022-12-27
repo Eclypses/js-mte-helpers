@@ -1,6 +1,6 @@
 {
   "name": "mte-helpers",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "The goal of this package is to make MTE as simple and easy to use as possible.",
   "scripts": {
     "rimraf": "rimraf ./core ./dist ./esm ./managed ./types ./utils",

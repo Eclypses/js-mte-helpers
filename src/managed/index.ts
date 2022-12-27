@@ -71,6 +71,14 @@ export async function instantiateMteWasm(
   >
 ) {
   /**
+   * If mteWasm is already instantiated, return true.
+   * This prevents multiple instantiations of mteWasm.
+   */
+  if (mteWasm) {
+    return true;
+  }
+
+  /**
    * If user provided their own state functions, use them.
    */
   if (options.saveState) {
