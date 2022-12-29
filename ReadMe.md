@@ -21,7 +21,7 @@ Then, install the MTE Helpers package:\
 MTE uses a Web Assembly (WASM) module to execute encode and decode operations. You must instantiate the MTE WASM module exactly once, and we recommend doing it as early as possible in your application.
 
 ```js
-import { instantiateMteWasm } from "mte-helpers";
+const { instantiateMteWasm } = require("mte-helpers");
 
 // Initialize MTE WASM module with credentials
 await instantiateMteWasm({
@@ -57,7 +57,7 @@ To create an encoder or decoder, you must provide three initialization values, a
    - A unique identifier that is assigned to the encoder or decoder. The ID should be absolutely unique; it should NOT match any other encoder or decoder.
 
 ```js
-import { createMteEncoder, createMteDecoder } from "mte-helpers";
+const { createMteEncoder, createMteDecoder } = require("mte-helpers");
 
 // three initialization values
 const initValues = {
@@ -91,10 +91,11 @@ await createMteDecoder({
 MTE can encode strings, including JSON, or binary data from a Uint8Array, which might represent a file or a chunk of a file. To encode data, call the encode function and pass in the data to encode, as well as the ID of the encoder to use.
 
 ```js
-import { mteEncode } from "mte-helpers";
+const { mteEncode } = require("mte-helpers");
 
 // encode data
 const encodedData = await mteEncode("P@ssw0rd!", { id: "encoder_001" });
+console.log(`Encoded Data: ${encodedData}`);
 ```
 
 [API Reference](./guides/api-reference/managed.md)
@@ -108,10 +109,11 @@ To decode data, call the decode function and pass in the data to decode, as well
   - MTE Decoders can decode data that was Fixed-Length (FLEN) encoded.
 
 ```js
-import { mteDecode } from "mte-helpers";
+const { mteDecode } = require("mte-helpers");
 
 // decode data
 const decoded = await mteDecode(encodedData, { id: "decoder_001" });
+console.log(`Decoded Data: ${decoded}`);
 ```
 
 [API Reference](./guides/api-reference/managed.md)
@@ -147,7 +149,7 @@ async function customTakeState(id) {
 Finally, pass your custom getter and setter functions into the initialization options object.
 
 ```js
-import { instantiateMteWasm } from "mte-helpers";
+const { instantiateMteWasm } = require("mte-helpers");
 
 // Initialize MTE WASM module with credentials
 await instantiateMteWasm({
