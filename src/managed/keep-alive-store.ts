@@ -7,14 +7,14 @@ import { EncDec } from "src/types";
 
 type StoreValue = {
   value: EncDec;
-  timeout: number;
+  timeout?: number;
 };
 
 // The store
 const store = new Map<any, StoreValue>();
 
 // Put an "alive" MTE Encoder/Decoder in the store, with it's timeout ID
-export function keepItemAlive(id: any, value: EncDec, timeout: number) {
+export function keepItemAlive(id: any, value: EncDec, timeout?: number) {
   store.set(id, {
     value,
     timeout,

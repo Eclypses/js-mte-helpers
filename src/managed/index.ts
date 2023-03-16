@@ -314,6 +314,11 @@ export async function mteEncode(
 
   // keep encoder alive, or save state to cache
   await (async () => {
+    if (options.keepAlive === Infinity) {
+      keepItemAlive(options.id, encoder);
+      return;
+    }
+
     // get encoder state
     const state = getMteState(
       encoder,
@@ -447,6 +452,11 @@ export async function mteDecode(
 
   // keep decoder alive, or save state to cache
   await (async () => {
+    if (options.keepAlive === Infinity) {
+      keepItemAlive(options.id, decoder);
+      return;
+    }
+
     // get decoder state
     const state = getMteState(
       decoder,

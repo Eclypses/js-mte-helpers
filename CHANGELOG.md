@@ -1,3 +1,7 @@
+- 0.1.9
+  - Support keepAlive option of "Infinity"
+- 0.1.7
+  - Improved TypeScript typings
 - 0.1.3
   - Update support to all versions greater than 3.0
   - Create core function to check DRBG Reseed interval and current status.
