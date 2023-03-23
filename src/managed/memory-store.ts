@@ -16,6 +16,5 @@ export async function setItem(id: any, value: any) {
 // Remove an item from the store
 export async function takeItem<T>(id: any): Promise<T> {
   const item = store.get(id);
-  store.delete(id);
   return item;
 }

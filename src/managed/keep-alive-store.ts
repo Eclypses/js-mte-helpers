@@ -28,7 +28,6 @@ export function takeAliveItem(id: any): EncDec | undefined {
     return undefined;
   }
   clearTimeout(item.timeout);
-  store.delete(id);
   return item.value;
 }
 
